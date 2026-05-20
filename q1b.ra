@@ -1,0 +1,11 @@
+q1b_nonzero :- \rename_{name, loanCount}
+  \aggr_{cname: count(lno)} borrower;
+
+q1b_zero_names :- \project_{name} customer
+  \diff
+  \rename_{name} \project_{cname} borrower;
+
+q1b_zero :- \rename_{name, loanCount}
+  \project_{name, 0} q1b_zero_names;
+
+q1b_nonzero \union q1b_zero;

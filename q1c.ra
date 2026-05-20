@@ -1,0 +1,27 @@
+q1c_type_counts_nonzero :- \rename_{loanType, borrowerCount}
+  \aggr_{type: count(cname)}
+    \project_{type, cname}
+      (loan \join_{no = lno} borrower);
+
+q1c_all_types :- \rename_{loanType} \project_{type} loan;
+
+q1c_zero_types :- q1c_all_types
+  \diff
+  \project_{loanType} q1c_type_counts_nonzero;
+
+q1c_type_counts_zero :- \rename_{loanType, borrowerCount}
+  \project_{loanType, 0} q1c_zero_types;
+
+q1c_type_counts :- q1c_type_counts_nonzero
+  \union
+  q1c_type_counts_zero;
+
+q1c_not_smallest :- \project_{t1.loanType}
+  \select_{t1.borrowerCount > t2.borrowerCount}
+    ((\rename_{t1: *} q1c_type_counts)
+      \cross
+     (\rename_{t2: *} q1c_type_counts));
+
+q1c_all_types
+  \diff
+  \rename_{loanType} q1c_not_smallest;

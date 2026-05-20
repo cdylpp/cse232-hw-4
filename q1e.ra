@@ -1,0 +1,23 @@
+q1e_counts_nonzero :- \rename_{no, type, borrowerCount}
+  \aggr_{no, type: count(cname)}
+    (loan \join_{no = lno} borrower);
+
+q1e_all_loans :- \project_{no, type} loan;
+
+q1e_zero_loans :- q1e_all_loans
+  \diff
+  \project_{no, type} q1e_counts_nonzero;
+
+q1e_counts_zero :- \rename_{no, type, borrowerCount}
+  \project_{no, type, 0} q1e_zero_loans;
+
+q1e_loan_counts :- q1e_counts_nonzero
+  \union
+  q1e_counts_zero;
+
+q1e_type_averages :- \rename_{type, avgBorrowerCount}
+  \aggr_{type: avg(borrowerCount)} q1e_loan_counts;
+
+\project_{no}
+  \select_{borrowerCount > avgBorrowerCount}
+    (q1e_loan_counts \join q1e_type_averages);

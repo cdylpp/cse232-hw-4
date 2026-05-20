@@ -1,0 +1,20 @@
+q1f_pairs :- \project_{name1, name2}
+  \select_{name1 < name2}
+    ((\rename_{c1: name1, credit1} customer)
+      \cross
+     (\rename_{c2: name2, credit2} customer));
+
+q1f_first_loans :- \project_{name1, name2, lno}
+  (q1f_pairs \join_{name1 = cname} borrower);
+
+q1f_second_loans :- \project_{name1, name2, lno}
+  (q1f_pairs \join_{name2 = cname} borrower);
+
+q1f_different_pairs :- \project_{name1, name2}
+  ((q1f_first_loans \diff q1f_second_loans)
+    \union
+   (q1f_second_loans \diff q1f_first_loans));
+
+q1f_pairs
+  \diff
+  q1f_different_pairs;

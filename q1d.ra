@@ -1,0 +1,17 @@
+q1d_names :- \project_{name} customer;
+
+q1d_types :- \rename_{type} \project_{type} loan;
+
+q1d_required :- q1d_names \cross q1d_types;
+
+q1d_actual :- \project_{name, type}
+  ((customer \join_{name = cname} borrower)
+    \join_{lno = no} loan);
+
+q1d_missing :- q1d_required
+  \diff
+  q1d_actual;
+
+q1d_names
+  \diff
+  \project_{name} q1d_missing;
